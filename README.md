@@ -6,7 +6,7 @@ I've always wanted to get into game development, so I committed to this project 
 
 This project has deepened my understanding of how individual components interact within a larger system. It has led to multiple structural revisions and improvements, highlighting my practical grasp of object-oriented programming principles such as inheritance, encapsulation, and modularity.
 
-Most of the tile assets and character animations were created or edited by me at the pixel level, reflecting both my dedication and enjoyment of the craft. I plan to continue expanding the game as a passion project.
+Many of the tile assets, particles and character animations were created or edited by me at the pixel level, reflecting both my dedication and enjoyment of the craft. I plan to continue expanding the game as a passion project.
 
 I had a lot of fun developing it into what it is today. Thanks again for checking it out, and I hope you enjoy playing!
 
@@ -65,7 +65,8 @@ I had a lot of fun developing it into what it is today. Thanks again for checkin
 
 - **Pygame** – for rendering and input handling  
 - **Piskel** – for creating and editing pixel art and animations  
-- **Custom Python tilemap engine** – for loading, rendering, and interacting with game levels  
+- **Custom Python tilemap engine** – for loading, rendering, and interacting with game levels 
+- **Custom Python editor** – for building maps; has brush sizes, map cycling, in-editor saving, a minimap, on and off grid placements, autotiling for certain tiles with similar neighbors
 
 ---
 
