@@ -6,7 +6,7 @@ import pygame
 import json
 
 from scripts.utils import  start_menu, show_message_screen
-from scripts.game_utils import load_assets, load_sounds, play_music, render_game_ui, setup_tutorials, load_level, create_player, handle_enemies, handle_projectiles, handle_input, handle_pickups, spawn_particles, check_character_unlocks
+from scripts.game_utils import load_assets, load_sounds, play_music, render_game_ui, setup_tutorials, load_level, create_player, handle_enemies, handle_projectiles, handle_input, handle_pickups, spawn_particles, check_character_unlocks, stop_dedicated_channels
 from scripts.tilemap import Tilemap
 from scripts.clouds import Clouds
 from scripts.config import STAGE_THEMES
@@ -16,6 +16,8 @@ from scripts.sparrows import Sparrows
 class Game:
     def __init__(self):
         pygame.init()
+        icon = pygame.image.load('data/images/UI/HiroIcon.png')
+        pygame.display.set_icon(icon)
         WIDTH = 320
         HEIGHT = 240
         pygame.display.set_caption('Ninja Hiro')
@@ -134,12 +136,13 @@ class Game:
                     self.save_data["best_times"][level_key] = self.timer
                 check_character_unlocks(self)
                 self.save_game(self.save_slot, self.save_data, self.character_id, self.level)
-                # Transition time
+                # Transition time .75s
                 self.transition += 1
-                if self.transition > 30:
+                if self.transition > 45:
                     # Play END screen if all levels complete
                     if self.level >= len(self.map_files) - 1:
                         show_message_screen(self.screen, "data/images/backgrounds/HiroReturn.png", self.font_path, title="Welcome Home!", subtitle="A brief rest after clearing the nearby castle, but a greater evil yet lurks...") # おめでとう！
+                        stop_dedicated_channels(self)
                         return "back_to_level_select"
                     # Else go to and unlock next level
                     else:
@@ -160,7 +163,7 @@ class Game:
                 if self.dead > 40:
                     load_level(self, self.level)
                     
-            # Set Render Scroll to track the player, but at 1/3 from the bottom of the screen
+            # Set Render Scroll to track the player near the center but at 1/3 from the bottom of the screen
             self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0] + 24) / 30
             target_y = self.display.get_height() * (2/3)
             self.scroll[1] += (self.player.rect().centery - target_y - self.scroll[1]) / 12

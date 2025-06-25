@@ -130,6 +130,7 @@ def get_stage_theme_data(level, stage_themes):
         "theme": "forest",
         "music": "data/music/level_music.wav",
         "background": forest_data["background"],
+        "ambience": data.get("ambience"), 
         "bird": forest_data.get("bird"),
         "rain": forest_data.get("rain")
     }
@@ -160,8 +161,8 @@ def load_level(game, map_id):
 
     # Switch music only on theme change
     if game.current_music_theme != theme_data["theme"]:
+        stop_dedicated_channels(game)
         play_music(theme_data["music"], volume=0.25)
-        game.sfx['cicada'].stop()
         game.current_music_theme = theme_data["theme"]
 
     # Add ambience sfx to most levels
@@ -639,3 +640,9 @@ def check_character_unlocks(game):
             character_sprite_data=game.character_data["Tengu"],
             wait_for_key=True
         )
+
+# Stops all ongoing sfx, used in theme change and game clear
+def stop_dedicated_channels(game):
+    for channel in game.dedicated_channels:
+        game.dedicated_channels[channel].stop()     
+
