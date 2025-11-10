@@ -1,0 +1,23 @@
+{
+  "Ninja Hiro": {
+    "name": "Ninja Hiro",
+    "sprite": "entities/basePlayer/NinjaHiro.png",
+    "size": [8, 15]
+  },
+  "Ninja Hana": {
+    "name": "Ninja Hana",
+    "sprite": "entities/basePlayer/NinjaHana.png",
+    "size": [8, 15]
+  },
+  "Tengu": {
+    "name": "Tengu",
+    "sprite": "entities/basePlayer/Tengu.png",
+    "size": [8, 15]
+  },
+  "Knight": {
+    "name": "Knight",
+    "sprite": "entities/basePlayer/Knight.png",
+    "size": [8, 15],
+    "scale": 0.6
+  }
+}
