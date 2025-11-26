@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import pygame
 import random
@@ -12,9 +13,26 @@ WIDTH = 320
 HEIGHT = 240
 BASE_IMG_PATH = 'data/images/'
 
+# Allows resoource paths to be overwritten when bundled as an exe
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
+# Creates a local save location in user/APPDATA/roaming/NinjaHiro
+def save_path(slot):
+    if sys.platform == "win32":
+        base_dir = os.path.join(os.environ['APPDATA'], "NinjaHiro")
+    else:  # fallback for macOS / Linux
+        base_dir = os.path.join(os.path.expanduser("~"), ".ninjahiro")
+
+    os.makedirs(base_dir, exist_ok=True)
+    return os.path.join(base_dir, f"save_{slot}.json")
+
 # Load a single image
 def load_image(path, scale=None):
-    img = pygame.image.load(BASE_IMG_PATH + path).convert_alpha()
+    full_path = resource_path(os.path.join(BASE_IMG_PATH, path))
+    img = pygame.image.load(full_path).convert_alpha()
     img.set_colorkey((0, 0, 0))
     if scale:
         img = pygame.transform.scale(img, scale)
@@ -22,9 +40,10 @@ def load_image(path, scale=None):
 
 # Load multiple images
 def load_images(path, scale=None):
+    folder = resource_path(os.path.join(BASE_IMG_PATH, path))
     images = []
-    for img_name in sorted(os.listdir(BASE_IMG_PATH + path)):
-        image = load_image(path + '/' + img_name)
+    for img_name in sorted(os.listdir(folder)):
+        image = load_image(os.path.join(path, img_name))
         if scale:
             image = pygame.transform.scale(image, scale)
         images.append(image)
@@ -45,7 +64,8 @@ def scaled_anim(path, scale=1.0, dur=6, loop=True):
 
 # Load a specified sound
 def load_sound(path, volume=1.0):
-    sound = pygame.mixer.Sound(path)
+    full_path = resource_path(path)
+    sound = pygame.mixer.Sound(full_path)
     sound.set_volume(volume)
     return sound
 
@@ -115,7 +135,6 @@ def pause_menu(self, offset):
         # Full game close loop
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
                 return "quit"
             if event.type == pygame.KEYDOWN:
                 # Unpause logic                
@@ -147,15 +166,17 @@ def start_menu(self, resume_data=None):
     menu_sparrows = []
     sparrow_timer = 0
     SPARROW_INTERVAL = random.randint(30, 180)
-    background = pygame.image.load(os.path.join("data", "images", "backgrounds/start_screen.png")).convert()
+    background_path = resource_path(os.path.join("data", "images", "backgrounds/start_screen.png"))
+    background = pygame.image.load(background_path).convert()
     background = pygame.transform.scale(background, (WIDTH * 3, HEIGHT * 3))
     # Ms between input repeats
     key_repeat_delay = 200  
     last_key_action_time = 0
 
     # Sort levels by number
+    maps_folder = resource_path("data/maps")
     level_files = sorted(
-        [f for f in os.listdir("data/maps") if f.endswith(".json") and f.split('.')[0].isdigit()],
+        [f for f in os.listdir(maps_folder) if f.endswith(".json") and f.split('.')[0].isdigit()],
         key=lambda f: int(f.split('.')[0])
     )
     level_names = [f.replace(".json", "") for f in level_files]
@@ -314,7 +335,7 @@ def start_menu(self, resume_data=None):
 
 # Shows a screen with a background and some text, for character unlocks and end screen
 def show_message_screen(screen, image_path, font_path, title=None, subtitle=None, character_sprite_data=None, wait_for_key=True):
-    bg_image = pygame.image.load(image_path).convert()
+    bg_image = pygame.image.load(resource_path(image_path)).convert()
     bg_image = pygame.transform.scale(bg_image, screen.get_size())
     screen.blit(bg_image, (0, 0))
 

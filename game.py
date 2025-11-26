@@ -5,7 +5,7 @@ import random
 import pygame
 import json
 
-from scripts.utils import  start_menu, show_message_screen
+from scripts.utils import  start_menu, show_message_screen, resource_path, get_save_path
 from scripts.game_utils import load_assets, load_sounds, play_music, render_game_ui, setup_tutorials, load_level, create_player, handle_enemies, handle_projectiles, handle_input, handle_pickups, spawn_particles, check_character_unlocks, stop_dedicated_channels
 from scripts.tilemap import Tilemap
 from scripts.clouds import Clouds
@@ -16,7 +16,7 @@ from scripts.sparrows import Sparrows
 class Game:
     def __init__(self):
         pygame.init()
-        icon = pygame.image.load('data/images/UI/HiroIcon.png')
+        icon = pygame.image.load(resource_path('data/images/UI/HiroIcon.png'))
         pygame.display.set_icon(icon)
         WIDTH = 320
         HEIGHT = 240
@@ -33,7 +33,7 @@ class Game:
         self.messages = []  
         self.tutorial_shown = {}  
         self.tip_queue = []
-        self.font_path = 'data/fonts/PressStart2P-Regular.ttf'
+        self.font_path = resource_path('data/fonts/PressStart2P-Regular.ttf')
         self.current_music_theme = None
         self.timer = 0
         self.screenshake = 0   
@@ -43,7 +43,7 @@ class Game:
         self.tilemap = Tilemap(self, tile_size=16)
  
         # Read character data
-        with open("data/characters.json") as f:
+        with open(resource_path("data/characters.json"), "r") as f:
             self.character_data = json.load(f)
 
         # Visual and sound assets
@@ -64,13 +64,12 @@ class Game:
         self.clouds = Clouds(self.assets['clouds'], self.screen.get_height(), count=6)
 
         # Sorted maps for main menu selection
-        self.map_files = sorted(os.listdir('data/maps'), key=lambda f: int(f.split('.')[0]))
+        self.map_files = sorted(os.listdir(resource_path('data/maps')), key=lambda f: int(f.split('.')[0]))
 
     # Loads user save data, used for unlocked characters, unlocked levels and best times
     def load_save(self, slot):
         # Create saves folder if non existent
-        os.makedirs("data/saves", exist_ok=True)  
-        save_path = f"data/saves/save_{slot}.json"
+        save_path = get_save_path(slot)
         # If a save is there, read relevant data
         if os.path.exists(save_path):
             with open(save_path, "r") as f:
@@ -93,7 +92,7 @@ class Game:
     def save_game(self, slot, save_data, character_id, level):
         # Ensure max_unlocked_level is the highest level reached
         save_data["max_unlocked_level"] = max(save_data.get("max_unlocked_level", 0), level)
-        save_path = f"data/saves/save_{slot}.json"
+        save_path = get_save_path(slot)
         # Save the data to the user profile
         with open(save_path, "w") as f:
             json.dump({
@@ -106,7 +105,7 @@ class Game:
 
 # -------------------------------------------------------------MAIN GAME----------------------------------------------------------------
     def run(self):
-        play_music('data/music/menu_theme.wav', volume=0.4)
+        play_music(resource_path('data/music/menu_theme.wav'), volume=0.4)
         self.dedicated_channels["ambience"].play(game.sfx['ambience'], loops=-1)
 
         # Handles pausing and unpausing
@@ -141,7 +140,7 @@ class Game:
                 if self.transition > 45:
                     # Play END screen if all levels complete
                     if self.level >= len(self.map_files) - 1:
-                        show_message_screen(self.screen, "data/images/backgrounds/HiroReturn.png", self.font_path, title="Welcome Home!", subtitle="A brief rest after clearing the nearby castle, but a greater evil yet lurks...") # おめでとう！
+                        show_message_screen(self.screen, resource_path("data/images/backgrounds/HiroReturn.png"), self.font_path, title="Welcome Home!", subtitle="A brief rest after clearing the nearby castle, but a greater evil yet lurks...") # おめでとう！
                         stop_dedicated_channels(self)
                         return "back_to_level_select"
                     # Else go to and unlock next level

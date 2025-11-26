@@ -2,7 +2,7 @@ import pygame
 import math
 import random
 from scripts.animation import Animation
-from scripts.utils import load_image, load_images, load_sound, render_text, render_centered_text, pause_menu, show_message_screen, scaled_anim
+from scripts.utils import resource_path, load_image, load_images, load_sound, render_text, render_centered_text, pause_menu, show_message_screen, scaled_anim
 from scripts.config import ASSET_PATHS, SFX_PATHS
 from scripts.pickups import pickup
 from scripts.entities import Gunner, Oni, Yurei
@@ -66,7 +66,7 @@ def load_sounds():
 # Plays music
 def play_music(path, volume=0.2):
     pygame.mixer.music.stop()
-    pygame.mixer.music.load(path)
+    pygame.mixer.music.load(resource_path(path))
     pygame.mixer.music.set_volume(volume)
     pygame.mixer.music.play(-1)
 
@@ -193,7 +193,7 @@ def load_level(game, map_id):
         game.dedicated_channels["rain"].stop()
 
     # Load tilemap and get level number
-    game.tilemap.load(f"data/maps/{game.map_files[map_id]}")
+    game.tilemap.load(resource_path(f"data/maps/{game.map_files[map_id]}"))
     game.current_map_id = int(game.map_files[map_id].split('.')[0])
 
     # Loads crumble blocks
@@ -312,8 +312,7 @@ def handle_input(game, render_scroll):
     # For full exit
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
+            return "quit"
 
         # Handle quit to menu/restart
         if event.type == pygame.KEYDOWN:
@@ -324,9 +323,8 @@ def handle_input(game, render_scroll):
                 if result == "restart":
                     load_level(game, game.level)
                     return "restart"
-                if not result:
-                    pygame.quit()
-                    exit()
+                if result == "quit":
+                    return "quit"
             # Basic Movement
             if event.key == pygame.K_a:
                 game.movement[0] = True
@@ -391,8 +389,8 @@ def handle_projectiles(game, render_scroll):
                     game.projectiles.remove(projectile)
                     break
 
-        # Handle enemy projectiles while not dashing
-        elif projectile["source"] == "enemy" and abs(game.player.dashing) < 50:
+        # Handle enemy and trap projectiles while not dashing
+        elif (projectile["source"] == "enemy" or projectile["source"] == "trap") and abs(game.player.dashing) < 50:
             # On player collision
             if game.player.rect().collidepoint(projectile["pos"]):
             # Ignore if under smoke_bomb effects                
@@ -552,7 +550,7 @@ def setup_tutorials(game):
     if game.level == 0 and "level_0_intro" not in game.tutorial_shown:
         show_message_screen(
             game.screen,
-            "data/images/backgrounds/HiroDeparture.png",
+            resource_path("data/images/backgrounds/HiroDeparture.png"),
             game.font_path,
             title="Evil forces have invaded!",
             subtitle="Leave no invader standing and free your allies from their demonic clutches!", #奴らを止めろ!
@@ -620,7 +618,7 @@ def check_character_unlocks(game):
         unlocked.append("Ninja Hana")
         show_message_screen(
             game.screen,
-            "data/images/backgrounds/HanaUnlock.png",
+            resource_path("data/images/backgrounds/HanaUnlock.png"),
             game.font_path,
             title="Character Unlocked!",
             subtitle="You unlocked Ninja Hana! Select her in the character menu.",
@@ -633,7 +631,7 @@ def check_character_unlocks(game):
         unlocked.append("Tengu")
         show_message_screen(
             game.screen,
-            "data/images/backgrounds/TenguUnlock.png",
+            resource_path("data/images/backgrounds/TenguUnlock.png"),
             game.font_path,
             title="Character Unlocked!",
             subtitle="You unlocked the Tengu! Select him in the character menu.",
