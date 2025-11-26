@@ -20,7 +20,7 @@ def resource_path(relative_path):
     return os.path.join(os.path.abspath("."), relative_path)
 
 # Creates a local save location in user/APPDATA/roaming/NinjaHiro
-def save_path(slot):
+def get_save_path(slot):
     if sys.platform == "win32":
         base_dir = os.path.join(os.environ['APPDATA'], "NinjaHiro")
     else:  # fallback for macOS / Linux
